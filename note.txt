@@ -1,0 +1,25 @@
+Dans la page welcome.html ("/showSummary"):
+  bug trouvé:
+    - Points available reste fixe
+    - dans competitions ('/showSummary') on remarque que l'on peut 
+    prendre plus de number place que de dispo, j'ai pu faire un -1 "number of Place" 
+    pour la compete "Spring Festival" avec le logging john@simplylift.co
+    - on dirait que les points/places prise ne sont pas save, normal ?
+
+
+Dans la page welcome.html ("/pruchasePlaces"):
+  bug trouvé:
+    - (après avoir select le nombre de place) les numbers places font un -10 
+    à chaque refresh de la page. Ceci affect seulement les competitions sur lequels 
+    on a modifié les number place disponible
+
+
+Dans la page de login:
+  bug trouvé:
+    - Internal Server Error lors d'un input vide pour l'@ mail
+    - Internal Server Error lors d'un input avec une @ mail non connu
+
+
+Dans la page Fall Classic ("/book/Fall%20Classic/Simply%20Lift"):
+  bug trouvé:
+    - possibilité d'y avoir access sans être loggé
