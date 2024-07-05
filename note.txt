@@ -14,10 +14,10 @@ Dans la page welcome.html ("/pruchasePlaces"):
     on a modifié les number place disponible
 
 
-Dans la page de login:
-  bug trouvé:
-    - Internal Server Error lors d'un input vide pour l'@ mail
-    - Internal Server Error lors d'un input avec une @ mail non connu
+Dans la page de login: =================================================================== OK!
+  bug trouvé: ============================================================================ OK!
+    - Internal Server Error lors d'un input vide pour l'@ mail =========================== OK!
+    - Internal Server Error lors d'un input avec une @ mail non connu ==================== OK!
 
 
 Dans la page Fall Classic ("/book/Fall%20Classic/Simply%20Lift"):
