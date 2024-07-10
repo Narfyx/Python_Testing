@@ -21,27 +21,32 @@ competitions = loadCompetitions()
 clubs = loadClubs()
 
 
-def authentification():
-    if "logged_in" not in session:
-        return render_template("index.html", error="Vous devez être connecté"), 400
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-@app.route("/showSummary", methods=["POST"])
+@app.route("/showSummary", methods=["GET", "POST"])
 def showSummary():
-    email = request.form.get("email")
-    if not email:
-        return render_template("index.html", error="Email is required"), 400
+    if request.method == "POST":
+        email = request.form.get("email")
+        if not email:
+            return render_template("index.html", error="Email is required"), 400
 
-    club = next((club for club in clubs if club["email"] == email), None)
-    if club is None:
-        return render_template("index.html", error="Email not found"), 400
+        club = next((club for club in clubs if club["email"] == email), None)
+        if club is None:
+            return render_template("index.html", error="Email not found"), 400
 
-    session["email"] = request.form["email"]
+        session["email"] = request.form["email"]
+        session["club"] = club  # Stocker le club dans la session
+    else:
+        if "email" not in session:
+            return redirect(url_for("index"))
+
+        club = session.get("club")
+        if not club:
+            return redirect(url_for("index"))
+
     return render_template("welcome.html", club=club, competitions=competitions)
 
 
@@ -68,8 +73,9 @@ def purchasePlaces():
     club = [c for c in clubs if c["name"] == request.form["club"]][0]
     placesRequired = int(request.form["places"])
     competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - placesRequired
+
     flash("Great-booking complete!")
-    return render_template("welcome.html", club=club, competitions=competitions)
+    return redirect(url_for("showSummary"))
 
 
 # TODO: Add route for points display
