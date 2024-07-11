@@ -20,7 +20,7 @@ def test_purchase_places_post_redirect_get(client):
     # Simuler une requête POST pour acheter des places
     response = client.post(
         "http://localhost/purchasePlaces",
-        data={"competition": "Spring Festival", "club": "Iron Temple", "places": "1"},
+        data={"competition": "Fall Classic", "club": "Iron Temple", "places": "1"},
     )
 
     # Vérifier que la réponse est une redirection
@@ -41,9 +41,9 @@ def test_purchase_places_post_redirect_get(client):
         assert "club" in sess
 
     # Vérifier que le nombre de places a été mis à jour correctement
-    competition = [c for c in competitions if c["name"] == "Spring Festival"][0]
+    competition = [c for c in competitions if c["name"] == "Fall Classic"][0]
     # print(competition)
 
     assert (
-        int(competition["numberOfPlaces"]) == 24
+        int(competition["numberOfPlaces"]) == 12
     )  # Suppose que le nombre initial de places était 25
