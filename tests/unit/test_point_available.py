@@ -1,6 +1,6 @@
 import pytest
-from flask import session
-from server import app, competitions
+from flask import url_for
+from server import app, loadCompetitions, competitions, session
 
 
 @pytest.fixture
@@ -8,29 +8,27 @@ def client():
     app.config["TESTING"] = True
     with app.test_client() as client:
         with app.app_context():
-            # Charger les données nécessaires
-            competitions
+            loadCompetitions()
         yield client
 
 
-def test_purchase_places_post_redirect_get(client):
+def test_purchase_places(client):
     # Simuler une connexion initiale pour stocker l'email dans la session
-    client.post("/showSummary", data={"email": "john@simplylift.co"})
+    client.post("/showSummary", data={"email": "admin@irontemple.com"})
+    club_before = session.get("club")["points"]
 
     # Simuler une requête POST pour acheter des places
     response = client.post(
         "http://localhost/purchasePlaces",
-        data={"competition": "Fall Classic", "club": "Iron Temple", "places": "0"},
+        data={"competition": "Fall Classic", "club": "Iron Temple", "places": "1"},
     )
-
-    # Vérifier que la réponse est une redirection
-    assert response.status_code == 302
-    assert response.headers["Location"] == "/showSummary"
 
     # Suivre la redirection
     response = client.get("/showSummary", follow_redirects=True)
 
     # Vérifier que la page welcome.html est affichée correctement
     assert response.status_code == 200
-    assert b"Welcome" in response.data
     assert b"Great-booking complete!" in response.data
+
+    club_after = session.get("club")["points"]
+    assert int(club_before) - int(club_after) == 1

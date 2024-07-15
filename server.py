@@ -1,5 +1,6 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for, session
+from pprint import pprint
 
 
 def loadClubs():
@@ -46,7 +47,6 @@ def showSummary():
         club = session.get("club")
         if not club:
             return redirect(url_for("index"))
-
     return render_template("welcome.html", club=club, competitions=competitions)
 
 
@@ -71,16 +71,23 @@ def purchasePlaces():
         0
     ]
     club = [c for c in clubs if c["name"] == request.form["club"]][0]
-    placesRequired = int(request.form["places"])
+    if request.form["places"]:
+        placesRequired = int(request.form["places"])
 
-    if int(competition["numberOfPlaces"]) < placesRequired:
-        flash("Not enough places available for the quantity you requested.")
+        if int(competition["numberOfPlaces"]) < placesRequired:
+            flash("Not enough places available for the quantity you requested.")
+        elif (int(club["points"]) - placesRequired) < 0:
+            flash("Not enough points available.")
+        else:
+            competition["numberOfPlaces"] = (
+                int(competition["numberOfPlaces"]) - placesRequired
+            )
+            club["points"] = str(int(club["points"]) - placesRequired)
+
+            session["club"] = club
+            flash("Great-booking complete!")
     else:
-        competition["numberOfPlaces"] = (
-            int(competition["numberOfPlaces"]) - placesRequired
-        )
-        flash("Great-booking complete!")
-
+        flash("Please complete the number places.")
     return redirect(url_for("showSummary"))
 
 
