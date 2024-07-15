@@ -15,11 +15,13 @@ def client():
 def test_purchase_places_not_enough(client):
     client.post("/showSummary", data={"email": "john@simplylift.co"})
 
-    competition = next(c for c in competitions if c["name"] == "Spring Festival")
-
+    competition = next(c for c in competitions if c["name"] == "Fall Classic")
+    print(competition)
+    competition["numberOfPlaces"] = "1"
+    print(competition)
     response = client.post(
         "/purchasePlaces",
-        data={"competition": "Fall Classic", "club": "She Lifts", "places": "13"},
+        data={"competition": "Fall Classic", "club": "She Lifts", "places": "2"},
     )
 
     assert response.status_code == 302

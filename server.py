@@ -74,7 +74,9 @@ def purchasePlaces():
     if request.form["places"]:
         placesRequired = int(request.form["places"])
 
-        if int(competition["numberOfPlaces"]) < placesRequired:
+        if placesRequired > 12:
+            flash("You not authorize to get more 12 places per competition")
+        elif int(competition["numberOfPlaces"]) < placesRequired:
             flash("Not enough places available for the quantity you requested.")
         elif (int(club["points"]) - placesRequired) < 0:
             flash("Not enough points available.")
