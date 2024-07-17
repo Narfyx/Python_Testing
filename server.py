@@ -47,7 +47,7 @@ def showSummary():
         club = session.get("club")
         if not club:
             return redirect(url_for("index"))
-    return render_template("welcome.html", club=club, competitions=competitions)
+    return render_template("welcome.html", club=club, competitions=competitions, session=session)
 
 
 @app.route("/book/<competition>/<club>")
@@ -62,7 +62,7 @@ def book(competition, club):
         )
     else:
         flash("Something went wrong-please try again")
-        return render_template("welcome.html", club=club, competitions=competitions)
+        return render_template("welcome.html", club=club, competitions=competitions, session=session)
 
 
 @app.route("/purchasePlaces", methods=["POST"])
@@ -74,7 +74,16 @@ def purchasePlaces():
     if request.form["places"]:
         placesRequired = int(request.form["places"])
 
-        if placesRequired > 12:
+        if "past_purchase" not in session:
+            session["past_purchase"] = {}
+        if competition["name"] not in session["past_purchase"]:
+            session["past_purchase"][competition["name"]] = 0
+            print(f"NEW == {session["past_purchase"]}")
+        print(session)
+        if (
+            placesRequired > 12
+            or (session["past_purchase"][competition["name"]] + placesRequired) > 12
+        ):
             flash("You not authorize to get more 12 places per competition")
         elif int(competition["numberOfPlaces"]) < placesRequired:
             flash("Not enough places available for the quantity you requested.")
@@ -85,7 +94,8 @@ def purchasePlaces():
                 int(competition["numberOfPlaces"]) - placesRequired
             )
             club["points"] = str(int(club["points"]) - placesRequired)
-
+            session["past_purchase"][competition["name"]] += placesRequired
+            print(f"NEW VALUE == {session["past_purchase"]}")
             session["club"] = club
             flash("Great-booking complete!")
     else:
