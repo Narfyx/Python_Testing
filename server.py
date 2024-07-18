@@ -77,7 +77,7 @@ def book(competition, club):
     foundCompetition = [c for c in competitions if c["name"] == competition][0]
 
     if foundClub and foundCompetition:
-        if foundCompetition["name"] in future_competitions:
+        if foundCompetition in future_competitions:
             return render_template(
                 "booking.html", club=foundClub, competition=foundCompetition
             )
