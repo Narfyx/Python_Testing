@@ -1,6 +1,6 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for, session
-from pprint import pprint
+from datetime import datetime
 
 
 def loadClubs():
@@ -20,6 +20,16 @@ app.secret_key = "something_special"
 
 competitions = loadCompetitions()
 clubs = loadClubs()
+
+
+def filter_future_competitions(competitions):
+    current_date = datetime.now()
+    future_competitions = [
+        competition
+        for competition in competitions
+        if datetime.strptime(competition["date"], "%Y-%m-%d %H:%M:%S") > current_date
+    ]
+    return future_competitions
 
 
 @app.route("/")
@@ -47,7 +57,14 @@ def showSummary():
         club = session.get("club")
         if not club:
             return redirect(url_for("index"))
-    return render_template("welcome.html", club=club, clubs=clubs, competitions=competitions, session=session)
+    future_competitions = filter_future_competitions(competitions)
+    return render_template(
+        "welcome.html",
+        club=club,
+        clubs=clubs,
+        competitions=future_competitions,
+        session=session,
+    )
 
 
 @app.route("/book/<competition>/<club>")
@@ -55,11 +72,18 @@ def book(competition, club):
     if "email" not in session:
         return redirect(url_for("index"), code=401)
     foundClub = [c for c in clubs if c["name"] == club][0]
+    future_competitions = filter_future_competitions(competitions)
+
     foundCompetition = [c for c in competitions if c["name"] == competition][0]
+
     if foundClub and foundCompetition:
-        return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition
-        )
+        if foundCompetition["name"] in future_competitions:
+            return render_template(
+                "booking.html", club=foundClub, competition=foundCompetition
+            )
+        else:
+            flash("This competition is no longer current")
+            return redirect(url_for("showSummary"))
     else:
         flash("Something went wrong-please try again")
         return redirect(url_for("showSummary"))
@@ -78,8 +102,7 @@ def purchasePlaces():
             session["past_purchase"] = {}
         if competition["name"] not in session["past_purchase"]:
             session["past_purchase"][competition["name"]] = 0
-            print(f"NEW == {session["past_purchase"]}")
-        print(session)
+
         if (
             placesRequired > 12
             or (session["past_purchase"][competition["name"]] + placesRequired) > 12
@@ -95,7 +118,6 @@ def purchasePlaces():
             )
             club["points"] = str(int(club["points"]) - placesRequired)
             session["past_purchase"][competition["name"]] += placesRequired
-            print(f"NEW VALUE == {session["past_purchase"]}")
             session["club"] = club
             flash("Great-booking complete!")
     else:
