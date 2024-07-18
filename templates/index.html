@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUDLFT Registration</title>
+    <title>{% block title %}GUDLFT Registration{% endblock %}</title>
 </head>
 <body>
     <h1>Welcome to the GUDLFT Registration Portal!</h1>
@@ -15,5 +16,21 @@
         <input type="email" name="email" id=""/>
         <button type="submit">Enter</button>
     </form>
+
+    <div>
+        <h2>Points Available for Each Club</h2>
+        <table border="1">
+            <tr>
+                <th>Club</th>
+                <th>Points</th>
+            </tr>
+            {% for club in clubs %}
+            <tr>
+                <td>{{ club.name }}</td>
+                <td>{{ club.points }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>
