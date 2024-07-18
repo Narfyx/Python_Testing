@@ -24,7 +24,7 @@ clubs = loadClubs()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", clubs=clubs)
 
 
 @app.route("/showSummary", methods=["GET", "POST"])
@@ -47,7 +47,7 @@ def showSummary():
         club = session.get("club")
         if not club:
             return redirect(url_for("index"))
-    return render_template("welcome.html", club=club, competitions=competitions, session=session)
+    return render_template("welcome.html", club=club, clubs=clubs, competitions=competitions, session=session)
 
 
 @app.route("/book/<competition>/<club>")
@@ -62,7 +62,7 @@ def book(competition, club):
         )
     else:
         flash("Something went wrong-please try again")
-        return render_template("welcome.html", club=club, competitions=competitions, session=session)
+        return redirect(url_for("showSummary"))
 
 
 @app.route("/purchasePlaces", methods=["POST"])
@@ -101,9 +101,6 @@ def purchasePlaces():
     else:
         flash("Please complete the number places.")
     return redirect(url_for("showSummary"))
-
-
-# TODO: Add route for points display
 
 
 @app.route("/logout")
