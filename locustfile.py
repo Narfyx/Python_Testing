@@ -29,7 +29,6 @@ Aggregated:
     req/s: 7.13 (taux global de requêtes par seconde).
 """
 
-
 from locust import HttpUser, task, between
 
 
